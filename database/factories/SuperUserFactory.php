@@ -35,8 +35,10 @@ class SuperUserFactory extends Factory
 
     public function configure()
     {
+
         return $this->afterCreating(function (SuperUser $superUser) {
-            $superUser->api_token = $superUser->createToken('super_access')->plainTextToken;
+            $token = $superUser->createToken('super_access')->plainTextToken;
+            $superUser->api_token = substr($token, 2);
             $superUser->save();
         });
     }
