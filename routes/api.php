@@ -5,11 +5,7 @@ use App\Models\SuperUser;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
-
-Route::post('/user', function (Request $request) {
-    $user = SuperUser::where('email', $request->email)->first();
-    return response()->json($user->tokens);
-})->middleware('auth:sanctum');
+use Illuminate\Support\Str;
 
 Route::post('/user/create', function (Request $request) {
     $token = $request->header('Authorization');
@@ -38,10 +34,43 @@ Route::post('/user/create', function (Request $request) {
 
     $api_key = $user->createToken('user', ['link:add', 'link:get', 'link:get_list'])->plainTextToken;
 
-    return response()->json($api_key);
+    return response()->json(['api_key' => $api_key]);
 })->middleware('auth:sanctum');
 
+Route::post('/create-link', function (Request $request) {
 
-Route::get('/text', function (): Response {
-    return response("answer from the text route(Changedfwefwe)");
-});
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email',
+        'password' => 'required',
+        'link' => 'required|url',
+        'public' => 'required|boolean',
+        'short_token' => 'nullable|min:8'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    $short_token = $request->short_token;
+
+    if (!$request->short_token || empty ($request->short_token)) {
+        $short_token = Str::random(8);
+    }
+
+    $user = User::where('email', $request->email)->first();
+
+    if (!$user || !Hash::check($request->password, $user->password)) {
+        return ([
+            'password' => ['The provided credentials are incorrect.'],
+        ]);
+    }
+
+    $res = $user->links()->create([
+        'link' => $request->link,
+        'short_token' => $short_token,
+        'public' => $request->public,
+    ]);
+
+    return response()->json(['response' => $res]);
+})->middleware('auth:sanctum');
+
