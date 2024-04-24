@@ -3,7 +3,7 @@
 use App\Http\Controllers\ApiController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/user/create', [ApiController::class, 'createUser'])->middleware('auth:sanctum');
+Route::post('/create-user', [ApiController::class, 'createUser'])->middleware('auth:sanctum');
 
 Route::post('/create-link', [ApiController::class, 'createLink'])->middleware('auth:sanctum');
 
