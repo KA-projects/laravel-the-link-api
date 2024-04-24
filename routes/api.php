@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Models\SuperUser;
+use App\Models\Link;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
@@ -73,4 +74,58 @@ Route::post('/create-link', function (Request $request) {
 
     return response()->json(['response' => $res]);
 })->middleware('auth:sanctum');
+
+Route::get('/get-links', function (Request $request) {
+    $email = $request->query('email');
+    $token = $request->query('token');
+
+    if (!$email && !$token) {
+        $links = Link::with('user')->where('public', true)->get();
+
+        return response()->json(['links' => $links]);
+    }
+
+    $user = User::where('email', $email)->first();
+
+    if (!$user) {
+        return response()->json("The user not found");
+    }
+
+    if ($email && !$token) {
+        $links = $user->links()->get();
+
+        return response()->json(['user-links' => $links]);
+    }
+
+    if ($email && $token) {
+        $link = $user->links()->where('short_token', $token)->first();
+        if (!$link) {
+            return response()->json("The link was not found for the passed token");
+        }
+        return response()->json(['user-link' => $link]);
+    }
+
+
+
+})->middleware('auth:sanctum');
+;
+
+
+Route::get('/{user}/{short_token}', function (Request $request, string $user, string $short_token) {
+    $user = User::where('email', $user)->first();
+
+    if (!$user) {
+        return response()->json("The user not found");
+    }
+
+    $link = $user->links()->where('short_token', $short_token)->first();
+
+    if (!$link) {
+        return response()->json("The link was not found for the passed token");
+    } else if (!$link->public) {
+        return response()->json("The link is private");
+    }
+    return redirect($link->link);
+});
+
 
