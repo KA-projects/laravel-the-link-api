@@ -22,7 +22,7 @@ php artisan serve
 
 ## Api Documentation
 
-**First** need to get `Superuser's API token` to create a user with limited rights. Superuser's API token is placed at 'super_users' table, in `api_token` column.To get this, in terminal to enter `php artisan tinker` and next to enter `App\Models\SuperUser::all();`
+**First** need to get `Superuser's API token` to create the users with limited rights. Superuser's API token is placed at 'super_users' table, in `api_token` column.To get this, in terminal to enter `php artisan tinker` and next to enter `App\Models\SuperUser::all();`
 
 ### 1. Create User
 
@@ -38,7 +38,7 @@ Creates a new user and generates an API key for the user(`The generated API key 
     {
         "email": "user@example.com",
         "name": "John Doe",
-        "password": "password"
+        "password": "password of the user"
     }
     ```
 
@@ -57,13 +57,13 @@ Creates a new link for a user.
 -   **URL:** `/api/create-link`
 -   **Method:** `POST`
 -   **Request Headers:**
-    -   `Authorization`: User's API token (Bearer token)
+    -   `Authorization`: User's API key (Bearer token)
 -   **Request Body:**
 
     ```json
     {
         "email": "user@example.com",
-        "password": "password",
+        "password": "password of the user",
         "link": "http://example.com",
         "public": true,
         "short_token": "custom_token(optional)"
@@ -85,7 +85,7 @@ Retrieves links associated with a user.
 -   **URL:** `/api/get-links`
 -   **Method:** `GET`
 -   **Request Headers:**
-    -   `Authorization`: User's API token (Bearer token)
+    -   `Authorization`: User's API key (Bearer token)
 -   **Query Parameters:**
     -   `email`: (optional) User's email
     -   `token`: (optional) Short token of the link
