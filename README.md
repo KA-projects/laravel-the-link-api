@@ -148,7 +148,6 @@ Creates a new link for a user.
 
 -   **URL:** `/api/{user}/{short_token}`
 -   **Method:** `GET`
--   **Request Body:**
 -   **Path Parametrs:**
 
     -   `user`: User's email
