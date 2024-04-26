@@ -35,15 +35,22 @@ class ApiController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $user = User::factory()->create([
-            'email' => $request->email,
-            'name' => $request->name,
-            'password' => $request->password
-        ]);
+        try {
+            $user = User::factory()->create([
+                'email' => $request->email,
+                'name' => $request->name,
+                'password' => $request->password
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'User creation failed: ' . $e->getMessage()], 500);
+        }
+
 
         $api_key = $user->createToken('user', ['link:add', 'link:get', 'link:get_list'])->plainTextToken;
 
-        return response()->json(['api_key' => substr($api_key, 2)]);
+        $api_key = substr($api_key, 2);
+
+        return response()->json(['api_key' => $api_key]);
     }
 
     public function createLink(Request $request)
@@ -74,11 +81,18 @@ class ApiController extends Controller
             return response()->json(['password' => 'The provided credentials are incorrect.'], 401);
         }
 
-        $res = $user->links()->create([
-            'link' => $request->link,
-            'short_token' => $short_token,
-            'public' => $request->public,
-        ]);
+
+        try {
+            $res = $user->links()->create([
+                'link' => $request->link,
+                'short_token' => $short_token,
+                'public' => $request->public,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Link creation failed: ' . $e->getMessage()], 500);
+        }
+
+
 
         return response()->json(['response' => $res]);
     }
