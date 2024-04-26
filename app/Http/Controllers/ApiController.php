@@ -22,7 +22,7 @@ class ApiController extends Controller
         $superuser = SuperUser::where('api_token', substr($token, 7))->first();
 
         if (!$superuser) {
-            return response()->json('Not authorized');
+            return response()->json('Not authorized', 401);
         }
 
         $validator = Validator::make($request->all(), [
@@ -69,13 +69,9 @@ class ApiController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
-            return ([
-                'user' => ['The provided credentials are incorrect.'],
-            ]);
+            return response()->json(['user' => 'The provided credentials are incorrect.'], 401);
         } else if (!Hash::check($request->password, $user->password)) {
-            return ([
-                'password' => ['The provided credentials are incorrect.'],
-            ]);
+            return response()->json(['password' => 'The provided credentials are incorrect.'], 401);
         }
 
         $res = $user->links()->create([
@@ -126,15 +122,15 @@ class ApiController extends Controller
         $user = User::where('email', $user)->first();
 
         if (!$user) {
-            return response()->json("The user not found");
+            return response()->json("The user not found", 404);
         }
 
         $link = $user->links()->where('short_token', $short_token)->first();
 
         if (!$link) {
-            return response()->json("The link was not found for the passed token");
+            return response()->json("The link was not found for the passed token", 404);
         } else if (!$link->public) {
-            return response()->json("The link is private");
+            return response()->json("The link is private", 403);
         }
         return redirect($link->link);
     }
