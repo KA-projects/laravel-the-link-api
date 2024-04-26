@@ -97,7 +97,7 @@ class ApiController extends Controller
         $user = User::where('email', $email)->first();
 
         if (!$user) {
-            return response()->json("The user not found");
+            return response()->json("The user not found", 404);
         }
 
         if ($email && !$token) {
@@ -109,7 +109,7 @@ class ApiController extends Controller
         if ($email && $token) {
             $link = $user->links()->where('short_token', $token)->first();
             if (!$link) {
-                return response()->json("The link was not found for the passed token");
+                return response()->json("The link was not found for the passed token", 404);
             }
             return response()->json(['user-link' => $link]);
         }
@@ -117,7 +117,7 @@ class ApiController extends Controller
 
     }
 
-    public function redirectToLink(Request $request, string $user, string $short_token): RedirectResponse
+    public function redirectToLink(Request $request, string $user, string $short_token)
     {
         $user = User::where('email', $user)->first();
 
