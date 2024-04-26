@@ -43,7 +43,7 @@ class ApiController extends Controller
 
         $api_key = $user->createToken('user', ['link:add', 'link:get', 'link:get_list'])->plainTextToken;
 
-        return response()->json(['api_key' => $api_key]);
+        return response()->json(['api_key' => substr($api_key, 2)]);
     }
 
     public function createLink(Request $request)
